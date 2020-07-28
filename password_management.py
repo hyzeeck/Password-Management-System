@@ -62,11 +62,8 @@ class SampleApp(tk.Tk):
         self.geometry("620x450+650+150")
         self.resizable(0,0)
         self.iconbitmap("icons/lock.ico")
-        
-
-        # the container is where we'll stack a bunch of frames
-        # on top of each other, then the one we want visible
-        # will be raised above the others
+        self.title("Paaword Manager")
+   
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -77,10 +74,6 @@ class SampleApp(tk.Tk):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
-
-            # put all of the pages in the same location;
-            # the one on the top of the stacking order
-            # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("StartPage")
@@ -108,23 +101,24 @@ class StartPage(tk.Frame):
         self.controller = controller
         label = tk.Label(self, text="Password Management System", font=controller.title_font, bg = "grey", fg = "white")
         
-        """bg_image = PhotoImage(file ="icons/bg1.gif")
+        bg_image = ImageTk.PhotoImage(Image.open("icons/bg1.gif"))
         xy = tk.Label (self,image = bg_image)
-        xy.place(x=0,y=0,relwidth=1,relheight=1)"""
-
+        xy.place(x=0,y=0,relwidth=1,relheight=1)
+        xy.image=bg_image
+        
         self.register=tk.Button(self)
-        self.register.place(relx=0.163,rely=0.374,height=43,width=156)
+        self.register.place(relx=0.163,rely=0.620,height=43,width=156)
         self.register.configure(text='Register',command=lambda : controller.show_frame("Register"))
         self.lab1=tk.Label(self)
-        self.lab1.place(relx=0.176,rely=0.308,height=26,width=137)
+        self.lab1.place(relx=0.176,rely=0.724,height=26,width=137)
         self.lab1.configure(text="New User? Register.")
         
         
         self.login=tk.Button(self)
-        self.login.place(relx=0.600,rely=0.374,height=43,width=156)
+        self.login.place(relx=0.580,rely=0.620,height=43,width=156)
         self.login.configure(text="Login",command =  lambda : controller.show_frame("Login"))
         self.lab2=tk.Label(self)
-        self.lab2.place(relx=0.660,rely=0.308,width=76,height=26)
+        self.lab2.place(relx=0.660,rely=0.724,width=76,height=26)
         self.lab2.configure(text='Login here')
         
         
