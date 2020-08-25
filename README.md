@@ -4,6 +4,7 @@ This is a school project built for a friend
 # Features
 -Password Management System that can be used to store passwords for various websites
 - simple,fast search
+- simple GUI
 - Master password hashed
 - all password and username/account name entries encoded
 
