@@ -1,11 +1,11 @@
 # Password Management System
-This is a school project built for a friend and still under development.....
+This is a school project built for a friend
 
 # Features
 -Password Management System that can be used to store passwords for various websites
 - simple,fast search
 - Master password hashed
-- all password and username/account name entries encrypted
+- all password and username/account name entries encoded
 
 # Requirements:
 
