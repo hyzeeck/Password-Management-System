@@ -1,6 +1,13 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue July  28 11:57:17 2020
+
+@author: Hyzeeck
+@author_email: hyzeeck234@gmail.com
+"""
+
 import tkinter as tk
 from tkinter import font  as tkfont 
-from PIL import ImageTk,Image
 import os
 import os.path as p
 from tkinter import messagebox
@@ -62,8 +69,12 @@ class SampleApp(tk.Tk):
         self.geometry("620x450+650+150")
         self.resizable(0,0)
         self.iconbitmap("icons/lock.ico")
-        self.title("Paaword Manager")
-   
+        self.title("Password Manager")
+        
+
+        # the container is where we'll stack a bunch of frames
+        # on top of each other, then the one we want visible
+        # will be raised above the others
         container = tk.Frame(self)
         container.pack(side="top", fill="both", expand=True)
         container.grid_rowconfigure(0, weight=1)
@@ -74,6 +85,10 @@ class SampleApp(tk.Tk):
             page_name = F.__name__
             frame = F(parent=container, controller=self)
             self.frames[page_name] = frame
+
+            # put all of the pages in the same location;
+            # the one on the top of the stacking order
+            # will be the one that is visible.
             frame.grid(row=0, column=0, sticky="nsew")
 
         self.show_frame("StartPage")
@@ -99,14 +114,13 @@ class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text="Password Management System", font=controller.title_font, bg = "grey", fg = "white")
         
-        bg_image = ImageTk.PhotoImage(Image.open("icons/bg1.gif"))
+        bg_image = tk.PhotoImage(file="icons/bg1.gif")
         xy = tk.Label (self,image = bg_image)
         xy.place(x=0,y=0,relwidth=1,relheight=1)
         xy.image=bg_image
-        
-        self.register=tk.Button(self)
+
+        self.register=tk.Button(self, bd=0)
         self.register.place(relx=0.163,rely=0.620,height=43,width=156)
         self.register.configure(text='Register',command=lambda : controller.show_frame("Register"))
         self.lab1=tk.Label(self)
@@ -135,19 +149,19 @@ class Register(tk.Frame):
         
         
         self.Label1 = tk.Label(self)
-        self.Label1.place(relx=0.197, rely=0.156, height=26, width=83)
+        self.Label1.place(relx=0.214, rely=0.156, height=26, width=83)
         self.Label1.configure(text='''Username :''')
         self.Label2 = tk.Label(self)
-        self.Label2.place(relx=0.205, rely=0.247, height=26, width=78)
+        self.Label2.place(relx=0.219, rely=0.247, height=26, width=78)
         self.Label2.configure(text='''Password :''')
         self.Label3 = tk.Label(self)
-        self.Label3.place(relx=0.182, rely=0.336, height=26, width=92)
-        self.Label3.configure(text='''Enter again :''')
+        self.Label3.place(relx=0.136, rely=0.336, height=26, width=136)
+        self.Label3.configure(text='''Re-Enter Password :''')
         self.Button1 = tk.Button(self)
-        self.Button1.place(relx=0.629, rely=0.511, height=43, width=116)
+        self.Button1.place(relx=0.229, rely=0.54, height=43, width=116)
         self.Button1.configure(text='''Register''',command=self.createUser)
         self.Button2 = tk.Button(self)
-        self.Button2.place(relx=0.629, rely=0.64, height=43, width=116)
+        self.Button2.place(relx=0.600, rely=0.54, height=43, width=116)
         self.Button2.configure(text='''Back to Login''',command = lambda : controller.show_frame("Login"))
         
         self.Entry1 = tk.Entry(self)
@@ -165,7 +179,9 @@ class Register(tk.Frame):
         username=self.Entry1.get()
         p1=self.Entry2.get()
         p2=self.Entry3.get()
-        if(p1!=p2):
+        if username=="" or p1=="" or p2=="":
+            messagebox.showerror('Error','All fields are required')
+        elif (p1!=p2):
             messagebox.showerror('Error',"Password did not match")
         else:
             password=(p1).encode('utf-8')
@@ -175,7 +191,7 @@ class Register(tk.Frame):
             l.append(dict())
             path=os.getcwd()+'/bin/'+username+'.json'
             if p.exists(path):
-                messagebox.showinfo('exists','An account with similar user name already exists\nPlease go to login page')
+                messagebox.showinfo('Account Exists','An account with similar user name already exists\nPlease go to login page')
                 self.Entry1.delete(0,tk.END)
                 self.Entry2.delete(0,tk.END)
                 self.Entry3.delete(0,tk.END)
@@ -215,7 +231,7 @@ class Login(tk.Frame):
         self.Button2.place(relx=0.180,rely=0.511,height=43,width=115)
         self.Button2.configure(text="Back",command = lambda : controller.show_frame("StartPage"))
         
-        #global Entry2,Entry3
+        global Entry2,Entry3
         self.Entry2 = tk.Entry(self)
         self.Entry2.place(relx=0.355, rely=0.251,height=24, relwidth=0.329)
         self.Entry2.configure(background="white")
@@ -252,17 +268,14 @@ class Login(tk.Frame):
 class ShowFrame(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.controller = controller
         s=Storage()
-
-        #Under development, want to add a heading here
-        #That is, when showing the accounts it should display heading ---website--Username---(encryted password)
-
+     
         self.data=s.getData()
         self.Button1_0 = tk.Button(self)
         self.Button1_0.place(relx=0.761, rely=0.100, height=33, width=131) 
         self.Button1_0.configure(pady="0")
-        self.Button1_0.configure(text='''Load''',command=self.loadlbox)
+        self.Button1_0.configure(text='''Load''', command=self.loadlbox)
+        
 
         self.Button1_1 = tk.Button(self)
         self.Button1_1.place(relx=0.761, rely=0.420, height=33, width=131)
@@ -277,27 +290,88 @@ class ShowFrame(tk.Frame):
         self.Button1_3.place(relx=0.761,rely=0.570,height=33,width=133)
         self.Button1_3.configure(text="Logout",command=lambda : controller.show_frame("StartPage"))
         self.Button1_4 = tk.Button(self)
-        self.Button1_4.place(relx=0.751,rely=0.7100,height=33,width=150)
+        self.Button1_4.place(relx=0.749,rely=0.7100,height=34,width=151)
         self.Button1_4.configure(text='''Change Master password''',command= self.changeMasterPassword)
         self.open=False
         
-        #to be modified.. 
+
         self.lbox = tk.Listbox(self,selectmode = "browse")
         self.lbox.place(relx=0.026,rely=0.036,relheight=0.923,relwidth=0.658)
+        #self.lbox_scrollbar.configure(command= self.lbox.yview)
+        #self.lbox_scrollbar.place(relx=0.26, rely=0.039)
         self.lbox.bind("<<ListboxSelect>>",self.popUpWindow)
         
         self.open=False
         self.list_sites = []
 
+    def confirmMaster(self):
+        us = self.Entry2.get()
+        pw = self.Entry3.get()
+        pw=pw.encode('utf-8')
+        s = Storage()
+        s.setUsername(us)
+        s.setPassword(pw)
+        path=os.getcwd()+'/bin/'+us+'.json'
+        if p.exists(path):
+            file=open(path,'r')
+            f=file.read()
+            file.close()
+            data=json.loads(f)
+            has_pw=hashlib.sha512(pw).hexdigest()
+            if has_pw==data[0]:
+                s.setData(data)
+                self.dec_password = self.decode(self.e3.get())   #self.data[1]
+                self.e3.delete(0,tk.END)
+                self.e3.insert(0,self.dec_password)
+                self.Decrypt_Button.configure(state='disabled')
+                
+            else:
+                messagebox.showinfo('Error','Incorrect Password')
+        else:
+            messagebox.showinfo('MisMatch',"Incorrect username")
+        self.vwindow.destroy()
+        
+    
+    #function to display decrypted the password
+    def decrypted(self):
+        
+        self.vwindow = tk.Toplevel(self)
+        self.vwindow.geometry("465x273+630+130")
+        self.vwindow.resizable(0,0)
+        self.vwindow.iconbitmap("icons/lock.ico")
+        self.vwindow.title("Verify Master Account")
+        
+        label = tk.Label(self.vwindow, text="Verify Master Password",font='Tahoma')
+        label.pack(side="top", fill="x", pady=10)
+
+        self.Entry2 = tk.Entry(self.vwindow)
+        self.Entry2.place(relx=0.357, rely=0.251,height=24, relwidth=0.329)
+        self.Entry2.configure(background="white")
+
+        self.Entry3 = tk.Entry(self.vwindow)
+        self.Entry3.place(relx=0.355, rely=0.344,height=24, relwidth=0.329)
+        self.Entry3.configure(background="white",show="*")
+     
+        self.Verify_Label1 = tk.Label(self.vwindow)
+        self.Verify_Label1.place(relx=0.21, rely=0.251, height=26, width=68)
+        self.Verify_Label1.configure(text='''Username''')
+        self.Verify_Label2 = tk.Label(self.vwindow)
+        self.Verify_Label2.place(relx=0.21, rely=0.344, height=26, width=64)
+        self.Verify_Label2.configure(text='''Password''')
+        
+        self.Verify_Button = tk.Button(self.vwindow)
+        self.Verify_Button.place(relx=0.402, rely=0.511, height=43, width=115)
+        self.Verify_Button.configure(text='''Enter''',command=self.confirmMaster)
+        #self.Verify_Button.bind('<Return>', confirmMaster)
+                
+
     def showWindow(self,site):
         """Window to display.....
-        Still to add verification here before it can display
-
+        
         """
         if not self.open:
             self.open = True
 
-            
             self.swindow = tk.Toplevel(self)
             self.swindow.geometry("485x293+650+150")
             self.swindow.resizable(0,0)
@@ -323,13 +397,13 @@ class ShowFrame(tk.Frame):
             self.Label3.configure(text='''Password''')
 
             self.Button1 = tk.Button(self.swindow)
-            self.Button1.place(relx=0.573, rely=0.348, height=33, width=56)
+            self.Button1.place(relx=0.573, rely=0.348, height=33, width=58)
             self.Button1.configure(text='''Copy''',command=self.copyUsername)
             self.Decrypt_Button = tk.Button(self.swindow)
-            self.Decrypt_Button.place(relx=0.575, rely=0.577, height=33, width=56)
-            self.Decrypt_Button.configure(text='''Decrypt''',command=self.decrypted)
+            self.Decrypt_Button.place(relx=0.575, rely=0.577, height=33, width=58)
+            self.Decrypt_Button.configure(text='''Decode''',command= self.decrypted)
             self.Button2 = tk.Button(self.swindow)
-            self.Button2.place(relx=0.775, rely=0.577, height=33, width=56)
+            self.Button2.place(relx=0.775, rely=0.577, height=33, width=58)
             self.Button2.configure(text='''Copy''',command=self.copyPassword)
             self.Button3 = tk.Button(self.swindow)
             self.Button3.place(relx=0.425, rely=0.802, height=43, width=130)
@@ -342,11 +416,7 @@ class ShowFrame(tk.Frame):
             self.e1.insert(tk.END,site)
             self.e2.insert(tk.END,self.username)
             self.e3.insert(tk.END,self.password)
-    #function to decrypt the password
-    def decrypted(self):
-        self.e3.delete(0,tk.END)
-        self.dec_password = self.decrypt(self.e3.get())
-        self.e3.insert(0,self.dec_password)
+
     #functions to copy username/password from the showwindow.
     def copyUsername(self):
         pyperclip.copy(self.e2.get())
@@ -377,7 +447,7 @@ class ShowFrame(tk.Frame):
             self.cha.iconbitmap("icons/lock.ico")
             self.cha.title("Change the master password")
             self.cha.geometry("562x355+321+137")
-            self.cha.resizable(False,False)
+            self.cha.resizable(0,0)
             self.cha.protocol('WM_DELETE_WINDOW', self.closeCha)
             b2 = tk.Button(self.cha)
             b2.place(relx=0.726, rely=0.691, height=36, width=106)
@@ -406,9 +476,8 @@ class ShowFrame(tk.Frame):
             la4 = tk.Label(self.cha)
             la4.place(relx=0.249, rely=0.507, height=26, width=70)
             la4.configure(text='''Re-Enter :''')
-    
-
-    #function to save the changes has been made.
+  
+   #function to save the changes has been made.
     def saveChanges(self):
         self.website = self.e1.get()
         self.data = Storage.loadData()
@@ -450,72 +519,25 @@ class ShowFrame(tk.Frame):
             self.closeCha()
         else:
             messagebox.showinfo('Mismatch','the password did not match')
-    ################################
-    """def encode(self, string, key="hyzeeck"):
-        encoded_chars = []
+    
+    def encode(self, string, key="hyzeeck"):
+        encoded = []
         for i in range(len(string)):
             key_c = key[i % len(key)]
-            # ord() gives the respective ascii value
-            encoded_c = chr(ord(string[i]) + ord(key_c) % 256)
-            encoded_chars.append(encoded_c)
-        encoded_string = "".join(encoded_chars)
-        string_bytes = encoded_string.encode("utf-8")   #This line is to be checked and modify
-        return base64.urlsafe_b64encode(string_bytes)
+            enc_c = chr((ord(string[i]) + ord(key_c)) % 256)
+            encoded.append(enc_c)
+        return base64.urlsafe_b64encode("".join(encoded).encode()).decode()
 
 
     def decode(self, string, key="hyzeeck"):
-        decoded_chars = []
-        # utf-8 to avoid character mapping errors
-        string = base64.urlsafe_b64decode(string.encode("utf-8"))
-        for i in xrange(len(string)):
+        decoded_ch = []
+        string = base64.urlsafe_b64decode(string).decode()
+        for i in range(len(string)):
             key_c = key[i % len(key)]
-            encoded_c = chr(abs(ord(string[i]) - ord(key_c) % 256))
-            decoded_chars.append(encoded_c)
-        decoded_string = "".join(decoded_chars)
-        return decoded_string
-    """
-    def encrypt(self, data):
-        str =""
-        temp =0
-        k=0
-        for i in data:
-            if i==" ":
-                str+=i
-                continue
-            if ord(i)%2==0:
-                k=1
-            else:
-                k=-1
-            temp = (ord(i))%32+k
-            if(temp>26):
-                temp = temp-26
-                str+= chr(((ord(i))/32)*32+temp)
-            elif(temp<=0):
-                temp = temp+26
-                str += chr(((ord(i)) / 32) * 32 + temp)
-            else:
-                str+=chr(ord(i)+k)
-        return str
-    def decrypt(self, data):
-        str=""
-        temp=0
-        k=0
-        for i in data:
-            if i==" ":
-                str+=i
-                continue
-            if ord(i)%2==0:
-                k=-1
-            else:
-                k=1
-            temp = (ord(i))%32
-            if(temp>=26):
-                str+=chr(((ord(i))/32)*32-k)
-            elif(temp<=1):
-                str+=chr(((ord(i)/32)*32)+26)
-            else:
-                str+=chr(ord(i)-k)
-        return str
+            dec_c = chr((256 + ord(string[i]) - ord(key_c)) % 256)
+            decoded_ch.append(dec_c)
+        return "".join(decoded_ch)
+    
     #function to add the new passwords.
     def saveAndClose(self):
         
@@ -526,19 +548,12 @@ class ShowFrame(tk.Frame):
         password=self.en3.get()
         re_entry=self.en4.get()
         if len(password)+len(username)+len(website)>3 and password==re_entry :
-            """encry_password=(password).encode('utf-8')
-            hashed_password=hashlib.sha512(encry_password).hexdigest()
-            l=[]
-            l.append(hashed_password)
-            l.append(dict())
-            path=os.getcwd()+'/SAFE/'+username+'.json' """
             
-            encoded_pass=self.encrypt(password)
+            #encoded_pass=self.encrypt(password)
             """
-            line = json.dumps(item) + ' '
-            self.file.write(line)
-            cipher = AES.new(secret_key,AES.MODE_ECB) # never use ECB in strong systems obviously
-            encoded_pass = base64.b64encode(password.encode("utf-8")) """
+            cipher = AES.new(secret_key,AES.MODE_ECB) # never use ECB in strong systems obviously"""
+            #encoded_pass = base64.b64encode(password.encode("utf-8")) 
+            encoded_pass = self.encode(password)
             if website not in self.data[1]:
                 self.list_sites.append(website)
                 #self.detail=[username,encoded_pass]
@@ -572,8 +587,9 @@ class ShowFrame(tk.Frame):
             self.open=True
             self.win = tk.Toplevel(self)
             self.win.title('Add the password')
+            self.win.iconbitmap('icons/lock.ico')
             self.win.geometry("562x375+321+157")
-            self.win.resizable(False,False)
+            self.win.resizable(0,0)
             self.win.protocol('WM_DELETE_WINDOW',self.closeAddWindow)
 
             self.b2 = tk.Button(self.win)
